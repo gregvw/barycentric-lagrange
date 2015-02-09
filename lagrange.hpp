@@ -1,37 +1,40 @@
 // lagrange.hpp
 
+#include<vector>
+
+typedef std::vector<double> dvec;
+
 class Lagrange{
     public:
-        Lagrange(int,double*, int, double*);
+        Lagrange(const dvec&, const dvec&);
         ~Lagrange();
 
         // Interpolate from the interpolation to the evaluation points
-        int interp(int,double*,int, double*);
+        void interp(const dvec&, dvec&);
 
         /* Implement sum formulas as found in equation 4.2 of Trefethen 
            and Berrut SIAM Review, Vol. 46, No. 3, pp.501-517 */
-        int bi_sum(double* f, double* y);
+        void bi_sum(const dvec&, dvec &);
 
-        // Because I don't know how to determine this at the Cython level
         int get_ne();
-
     private:
         // Number of interpolation points
         int ni;
 
-        // Number of evaluation points
         int ne;
 
+        // Number of evaluation points
+
         // Values of interpolation points  
-        double *xi; 
+        dvec xi; 
 
         // Values of evaluation points
-        double *xe;
+        dvec xe;
 
         // Interpolation weights
-        double *w;
+        dvec w;
 
         // Barycentric multiplicative polynomial
-        double *ell;
+        dvec ell;
 
 };

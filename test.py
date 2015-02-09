@@ -2,7 +2,7 @@ import numpy as np
 import numpy.polynomial.chebyshev as C
 import time
 from scipy.interpolate import BarycentricInterpolator as bi
-from cy_lagrange import Barycentric
+from barycentric import Barycentric
 
 if __name__ == '__main__':
 
@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     t.append(time.time())    
  
+    fe = np.zeros(ne)
     fe = bary.interp(fi)
 
     t.append(time.time())    

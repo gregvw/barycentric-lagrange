@@ -11,12 +11,12 @@ os.environ["CC"] = "g++"
 os.environ["CXX"] = "g++"
 
 
-setup( name = 'lagrange',
+setup( name = 'barycentric',
        version = '0.1',
        author = 'Greg von Winckel',
        description = 'C++ class for Barycentric Lagrange inerpolation with Cython',
-       ext_modules=[Extension("cy_lagrange",
-                        sources=["cy_lagrange.pyx","lagrange.cpp"],
+       ext_modules=[Extension("barycentric",
+                        sources=["barycentric.pyx","lagrange.cpp"],
                         language="c++",
                         include_dirs=[numpy.get_include()])
        ],

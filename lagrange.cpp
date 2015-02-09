@@ -1,88 +1,55 @@
 #include"lagrange.hpp"
-#include<iostream>
-
-using namespace std;
-
 
 // Constructor
-Lagrange::Lagrange(int numInterpPts, double* xInterp, int numEvalPts, double* xEval)
-{
-   // Loop indices
-    int j,k;
-
-    // For storing displacements between interpolation points
-    double d;
-
-    ni = numInterpPts;
-    ne = numEvalPts;
-    xi = xInterp;
-    xe = xEval;
-  
-    // Array of Barycentric weights
-    w = new double[ni];
-
-    // Barycentric polynomial ell(x) on evaluation points
-    ell = new double[ne]; 
+Lagrange::Lagrange(const dvec &xInterp, const dvec &xEval) : 
+    ni(xInterp.size()), ne(xEval.size()), xi(xInterp), xe(xEval), 
+    w(dvec(xInterp.size(),0)), ell(dvec(xEval.size(),0)) {
 
     /* Compute the weights using as slightly modified version of the 
        algorithm on page 504 in the Trefethen & Berrut paper */
     
-    w[0] = 1;
+    w[0] = 1.0;
     
     // I think this loop can not be parallelized
-    for(j=1;j<ni;++j)
+    for(int j=1;j<ni;++j)
     {
         w[j] = 1;
 
-        for(k=0;k<j;++k)
+        for(int k=0;k<j;++k)
         {
-            d = xi[k]-xi[j];
+            double d = xi[k]-xi[j];
             w[k] *= d;
             w[j] *= -d;
         }
     }
 
-    for(j=0;j<ni;++j)
+    for(int j=0;j<ni;++j)
     {
-        w[j] = 1/w[j];
+        w[j] = 1.0/w[j];
     }
   
-    double* ones = new double[ni];     // Create vector of ones
+    dvec ones(ni,1.0);          // Create vector of ones
   
-    for(j=0;j<ni;++j)
-    {
-        ones[j] = 1;
-    }
-
     this->bi_sum(ones,ell);    // Compute the ell(x) polynomial
 
-    for(j=0;j<ne;++j)
+    for(int j=0;j<ne;++j)
     {
-        ell[j] = 1/ell[j];
+        ell[j] = 1.0/ell[j];
     }
- 
-    delete ones;   
 }
 
 
-Lagrange::~Lagrange()
-{
-    delete w;
-    delete ell;
- }
+Lagrange::~Lagrange(){
+}
 
-int Lagrange::bi_sum(double* f, double* y)
-{
+void Lagrange::bi_sum(const dvec &f, dvec &y){
     /* This routine evaluates sums of the form shown in equation (4.2) in 
        the paper by J-P Berrut and L.N. Trefethen */
 
-    // Loop indices
-    int j,k;
-
-    for(j=0;j<ne;++j)
+    for(int j=0;j<ne;++j)
     {
         y[j] = 0;
-        for(k=0;k<ni;++k)
+        for(int k=0;k<ni;++k)
         {
             if(xe[j] == xi[k])
             {
@@ -95,28 +62,20 @@ int Lagrange::bi_sum(double* f, double* y)
             }
         }    
     }    
-    return 1;
 }
 
 
-int Lagrange::interp(int mi, double* func, int mo, double* poly)
-{
-    int j;
+void Lagrange::interp(const dvec &func, dvec &poly){
 
     this->bi_sum(func,poly);
 
-    for(j=0;j<ne;++j)
+    for(int j=0;j<ne;++j)
     {
         poly[j] *= ell[j];
     }    
-    return 1;
 }
 
-int Lagrange::get_ne()
-{
+
+int Lagrange::get_ne(void) { 
     return ne;
 }
-
-
-
-
